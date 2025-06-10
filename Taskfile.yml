@@ -1,0 +1,24 @@
+version: '3'
+
+tasks:
+  start:
+    cmds:
+      - mvn spring-boot:run
+    desc: Runs the Spring Boot application
+
+  build:
+    cmds:
+      - mvn clean install
+    desc: Builds the project with Maven
+
+  stop:
+    cmds:
+      - pkill -f 'java -jar.*spring-boot'
+    desc: Stops the running Spring Boot application
+    silent: true
+
+  restart:
+    cmds:
+      - task: stop
+      - task: start
+    desc: Restarts the Spring Boot application

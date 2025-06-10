@@ -55,6 +55,7 @@ public class EmailService {
 
         for (String email : recipients) {
             try {
+                trim(email); // Ensure email is trimmed
                 MimeMessage message = mailSender.createMimeMessage();
                 MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
@@ -71,5 +72,12 @@ public class EmailService {
                 logger.error("Failed to send resume to {}: {}", email, e.getMessage(), e);
             }
         }
+    }
+
+    private static void  trim(String str){
+        if (str == null) {
+            return ;
+        }
+        str= str.trim();
     }
 }
