@@ -2,11 +2,13 @@ package com.example.resume_service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.validation.constraints.Email;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -20,23 +22,23 @@ public class EmailService {
     private static final String SUBJECT = "Resume – Adesh Malunjkar | Java Backend Developer";
 
     private static final String BODY = """
-        Hi,
-        Please find attached my resume for your consideration. I am a Java backend developer with 3 years of experience in building scalable microservices and cloud-native solutions.
+            Hi,
+            Please find attached my resume for your consideration. I am a Java backend developer with 3 years of experience in building scalable microservices and cloud-native solutions.
 
-        Looking forward to the opportunity to connect.
+            Looking forward to the opportunity to connect.
 
-         🔹 Total experience: 3 yrs
-         🔹 Notice Period : 30 days
-         🔹 Current CTC: 11,44,000 LPA
-         🔹 Expected CTC: 16 to 20 LPA
-         🔹 Current Location: Noida,UP
-         🔹 Preferred Location: Pune/Remote
+             🔹 Total experience: 3 yrs
+             🔹 Notice Period : 30 days
+             🔹 Current CTC: 11,44,000 LPA
+             🔹 Expected CTC: 16 to 20 LPA
+             🔹 Current Location: Noida,UP
+             🔹 Preferred Location: Pune/Remote
 
-        Best regards,
-        Adesh Malunjkar
-        📞 +91-88568 35971
-        📧 3636adesh@gmail.com
-        """;
+            Best regards,
+            Adesh Malunjkar
+            📞 +91-88568 35971
+            📧 3636adesh@gmail.com
+            """;
 
     private static final String ATTACHMENT_PATH = "/home/adeshmalunjkar/me/temp/final-resume/AdeshResume_1.2.pdf";
 
@@ -46,6 +48,7 @@ public class EmailService {
         this.mailSender = mailSender;
     }
 
+    @Async("emailExecutor")
     public void sendResume(List<String> recipients) {
         FileSystemResource file = new FileSystemResource(new File(ATTACHMENT_PATH));
         if (!file.exists()) {
@@ -55,7 +58,7 @@ public class EmailService {
 
         for (String email : recipients) {
             try {
-                trim(email); // Ensure email is trimmed
+                email = Trim.trim(email); // Ensure email is trimmed
                 MimeMessage message = mailSender.createMimeMessage();
                 MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
@@ -74,10 +77,21 @@ public class EmailService {
         }
     }
 
-    private static void  trim(String str){
-        if (str == null) {
-            return ;
+    static class Trim {
+        public static String trim(String str) {
+            try {
+                return trimming(str);
+            } catch (Exception e) {
+                logger.error("Error trimming email: {}", str, e);
+                return str;
+            }
         }
-        str= str.trim();
+
+        private static String trimming(@Email String str) {
+            return (str == null) ? null : str.trim();
+
+        }
     }
+
+
 }
