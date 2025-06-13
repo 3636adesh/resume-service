@@ -47,7 +47,7 @@ public class SMTPService {
     
              🔹 Total experience: 3 yrs
              🔹 Notice Period : 30 days
-             🔹 Current CTC: 11,44,000 LPA
+             🔹 Current CTC: 11.44 LPA
              🔹 Expected CTC: 16 to 20 LPA
              🔹 Current Location: Noida,UP
              🔹 Preferred Location: Pune/Remote
