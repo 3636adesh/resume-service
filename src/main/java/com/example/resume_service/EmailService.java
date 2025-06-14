@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class EmailService {
@@ -32,7 +33,7 @@ public class EmailService {
             logger.error("Attachment file not found: {}", ATTACHMENT_PATH);
             return;
         }
-
+        recipients = recipients.stream().map(Trim::trim).filter(Objects::nonNull).distinct().toList();
         for (String email : recipients) {
             try {
                 sMTPService.sendEmail(email, file);

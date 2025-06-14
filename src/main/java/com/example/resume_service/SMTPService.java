@@ -31,9 +31,11 @@ public class SMTPService {
 
         helper.setTo(email);
         helper.setSubject(SUBJECT);
-        helper.setText(BODY, false); // false = plain text, set true for HTML
+        helper.setText(BODY, false);
 
-        helper.addAttachment("Adesh_Malunjkar_Resume.pdf", file);
+        String fileName = "Adesh_Malunjkar_Java_Developer_Resume.pdf";
+        helper.addAttachment(fileName, file);
+
 
         mailSender.send(message);
         logger.info("Resume sent to {}", email);
@@ -41,26 +43,35 @@ public class SMTPService {
 
     private static final String BODY = """
             Hi,
-            Please find attached my resume for your consideration. I am a Java backend developer with 3 years of experience in building scalable microservices and cloud-native solutions.
 
-            Looking forward to the opportunity to connect.
-    
-             🔹 Total experience: 3 yrs
-             🔹 Notice Period : 30 days
-             🔹 Current CTC: 11.44 LPA
-             🔹 Expected CTC: 16 to 20 LPA
-             🔹 Current Location: Noida,UP
-             🔹 Preferred Location: Pune/Remote
+            Please find my resume attached for the Java Backend Developer position.
+
+            Below are my details for your consideration:
+
+            - Total Experience: 3 years (Java, Spring Boot, Microservices)
+            - Relevant Experience: 3 years in building scalable cloud-native apps
+            - Current CTC: ₹11.44 LPA
+            - Expected CTC: ₹16 – ₹20 LPA
+            - Notice Period: 30 days (Negotiable)
+            - Current Location: Noida, UP
+            - Preferred Location: Pune / Remote
+
+            Highlights:
+            - Reduced API latency by 60% for an EdTech platform handling 180k+ users/month
+            - Experienced with AKS, Kafka, PostgreSQL, Redis, and CI/CD pipelines
+            - Built secure microservices with Spring Security & OAuth 2.0
+            - Finalist at SAP BTP Hackathon 2024 (Invoice matching microservice)
+
+            Thank you for your time and consideration. I look forward to your response.
 
             Best regards,
             Adesh Malunjkar
-            📞 +91-88568 35971
-            📧 3636adesh@gmail.com
+            +91-88568 35971
+            3636adesh@gmail.com
             """;
 
 
-    private static final String SUBJECT = "Resume – Adesh Malunjkar | Java Backend Developer";
-
+    private static final String SUBJECT = "Resume - Adesh Malunjkar | Java / Software Developer | 3 Yrs Exp";
 
 
 }
