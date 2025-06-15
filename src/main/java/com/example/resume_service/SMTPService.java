@@ -44,25 +44,19 @@ public class SMTPService {
     private static final String BODY = """
             Hi,
 
-            Please find my resume attached for the Java Backend Developer position.
+            I am writing to express my interest in the Java Backend Developer position. I am a Java backend developer with 3 years of experience building scalable microservices and cloud-native solutions.
 
             Below are my details for your consideration:
 
             - Total Experience: 3 years (Java, Spring Boot, Microservices)
             - Relevant Experience: 3 years in building scalable cloud-native apps
             - Current CTC: ₹11.44 LPA
-            - Expected CTC: ₹16 – ₹20 LPA
+            - Expected CTC: ₹16–20 LPA
             - Notice Period: 30 days (Negotiable)
             - Current Location: Noida, UP
             - Preferred Location: Pune / Remote
 
-            Highlights:
-            - Reduced API latency by 60% for an EdTech platform handling 180k+ users/month
-            - Experienced with AKS, Kafka, PostgreSQL, Redis, and CI/CD pipelines
-            - Built secure microservices with Spring Security & OAuth 2.0
-            - Finalist at SAP BTP Hackathon 2024 (Invoice matching microservice)
-
-            Thank you for your time and consideration. I look forward to your response.
+            Thank you for your time and consideration. I look forward to the opportunity to discuss how I can contribute to your team.
 
             Best regards,
             Adesh Malunjkar
