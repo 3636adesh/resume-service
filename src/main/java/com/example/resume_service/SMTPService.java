@@ -14,9 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SMTPService {
 
-
     private static final Logger logger = LoggerFactory.getLogger(SMTPService.class);
-
 
     private final JavaMailSender mailSender;
 
@@ -26,6 +24,7 @@ public class SMTPService {
 
     @Async("emailExecutor")
     void sendEmail(String email, FileSystemResource file) throws MessagingException {
+        logger.info("Sending resume to {}", email);
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
@@ -60,7 +59,7 @@ public class SMTPService {
 
             Best regards,
             Adesh Malunjkar
-            +91-88568 35971
+            +91-88568 35971reboot
             3636adesh@gmail.com
             """;
 
