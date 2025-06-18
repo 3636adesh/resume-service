@@ -88,3 +88,7 @@ build/
 maven-*.properties
 mvnw.cmd
 mvnw
+
+
+application.properties
+application*.properties

@@ -10,6 +10,9 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
+
 
 @Service
 public class SMTPService {
@@ -22,8 +25,10 @@ public class SMTPService {
         this.mailSender = mailSender;
     }
 
+    private final AtomicInteger emailSentCount = new AtomicInteger(0);
+
     @Async("emailExecutor")
-    void sendEmail(String email, FileSystemResource file) throws MessagingException {
+    CompletableFuture<Void>  sendEmail(String email, FileSystemResource file) throws MessagingException {
         logger.info("Sending resume to {}", email);
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -38,7 +43,14 @@ public class SMTPService {
 
         mailSender.send(message);
         logger.info("Resume sent to {}", email);
+        emailSentCount.incrementAndGet();
+        return CompletableFuture.completedFuture(null);
     }
+
+    public int getEmailSentCount() {
+        return emailSentCount.get();
+    }
+
 
     private static final String BODY = """
             Hi,

@@ -9,8 +9,10 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class EmailService {
@@ -32,13 +34,20 @@ public class EmailService {
             return;
         }
         recipients = recipients.stream().map(Trim::trim).filter(Objects::nonNull).distinct().toList();
+
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
         for (String email : recipients) {
             try {
-                sMTPService.sendEmail(email, file);
+                CompletableFuture<Void> voidCompletableFuture = sMTPService.sendEmail(email, file);
+                futures.add(voidCompletableFuture);
             } catch (Exception e) {
                 logger.error("Error while sending email via SMTP, email: {}", email, e);
             }
         }
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+
+        int totalSent = sMTPService.getEmailSentCount();
+        logger.info("✅ Total emails successfully sent: {}", totalSent);
     }
 
     static class Trim {
