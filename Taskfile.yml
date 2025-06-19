@@ -2,20 +2,21 @@ version: '3'
 
 tasks:
   start:
+    deps: [build]
     cmds:
-      - mvn spring-boot:run
+      - "docker compose up -d"
     desc: Runs the Spring Boot application
 
   build:
     cmds:
-      - mvn clean install
+      - mvn spring-boot:build-image -DskipTests
     desc: Builds the project with Maven
 
   stop:
     cmds:
-      - pkill -f 'java -jar.*spring-boot'
-    desc: Stops the running Spring Boot application
-    silent: true
+      - "docker compose stop"
+      - "docker compose rm -f"
+    desc: Stops the Spring Boot application
 
   restart:
     cmds:

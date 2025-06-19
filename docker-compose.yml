@@ -1,0 +1,14 @@
+name: 'spring-boot-microservices-course'
+services:
+    resume-service:
+        image: adeshmalunjkar/resume-service
+        container_name: resume-service
+        ports:
+            - "9898:9898"
+        restart: unless-stopped
+        deploy:
+            resources:
+                limits:
+                    memory: 700m
+        labels:
+            logging: "promtail"
