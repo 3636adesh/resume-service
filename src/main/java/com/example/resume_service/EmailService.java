@@ -47,7 +47,7 @@ public class EmailService {
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
         int totalSent = sMTPService.getEmailSentCount();
-        logger.info("✅ Total emails successfully sent: {}", totalSent);
+        logger.info("✅  Total emails successfully sent: {}", totalSent);
     }
 
     static class Trim {
