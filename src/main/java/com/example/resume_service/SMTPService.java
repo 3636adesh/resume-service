@@ -34,11 +34,11 @@ public class SMTPService {
     CompletableFuture<Void>  sendEmail(String email, FileSystemResource file) throws MessagingException {
         logger.info("Sending resume to {}", email);
         MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        MimeMessageHelper helper = new MimeMessageHelper(message, true,"UTF-8");
 
         helper.setTo(email);
         helper.setSubject(resumeTemplate.getSubject());
-        helper.setText(resumeTemplate.getBody(), false);
+        helper.setText(resumeTemplate.getBody(), true);
         helper.addAttachment(resumeTemplate.getAttachmentName(), file);
 
         mailSender.send(message);
@@ -50,8 +50,6 @@ public class SMTPService {
     public int getEmailSentCount() {
         return emailSentCount.get();
     }
-
-
 
 
 }
