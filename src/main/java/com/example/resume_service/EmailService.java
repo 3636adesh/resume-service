@@ -19,7 +19,7 @@ public class EmailService {
 
     private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
-    private static final String ATTACHMENT_PATH = "/home/adeshmalunjkar/me/temp/final-resume/AdeshResume_1.5.pdf";
+    private static final String ATTACHMENT_PATH = "/home/adeshmalunjkar/me/temp/final-resume/AdeshResume.pdf";
 
     private final SMTPService sMTPService;
 

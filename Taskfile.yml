@@ -23,3 +23,9 @@ tasks:
       - task: stop
       - task: start
     desc: Restarts the Spring Boot application
+
+
+  run:
+      cmds:
+        - "mvn clean install -DskipTests spring-boot:run"
+      desc: Runs the Spring Boot application
