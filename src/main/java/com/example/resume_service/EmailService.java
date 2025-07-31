@@ -58,7 +58,7 @@ public class EmailService {
                 continue;
             }
 
-            ResumeTracking resumeTracking = auditEmailBefore(email);
+            ResumeTracking resumeTracking = auditEmailBefore(email,isFreelancing);
 
             try {
                 CompletableFuture<Void> future = isFreelancing
@@ -92,10 +92,13 @@ public class EmailService {
 
     }
 
-    private ResumeTracking auditEmailBefore(String email) {
+    private ResumeTracking auditEmailBefore(String email, boolean isFreelancing) {
         ResumeTracking tracking = new ResumeTracking();
         tracking.setRecruiterEmail(email);
         tracking.setMessage("📧 Sending resume to " + email);
+        if (isFreelancing) {
+            tracking.setType(ResumeTracking.TYPE_FREE_LANCING);
+        }
         return resumeTrackingRepository.save(tracking);
     }
 
@@ -111,7 +114,7 @@ public class EmailService {
         resumeTrackingRepository.save(tracking);
     }
 
-   private static class Trim {
+    private static class Trim {
         public static String trim(String str) {
             return (str == null) ? null : str.trim();
         }
