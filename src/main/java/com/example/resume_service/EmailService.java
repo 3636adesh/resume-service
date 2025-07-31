@@ -1,11 +1,8 @@
 package com.example.resume_service;
 
-
-import jakarta.validation.constraints.Email;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
-
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -18,53 +15,105 @@ import java.util.concurrent.CompletableFuture;
 public class EmailService {
 
     private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
-
     private static final String ATTACHMENT_PATH = "/home/adeshmalunjkar/me/temp/final-resume/AdeshResume.pdf";
 
-    private final SMTPService sMTPService;
+    private final SMTPService smtpService;
+    private final ResumeLogRepository resumeLogRepository;
+    private final ResumeTrackingRepository resumeTrackingRepository;
 
-    public EmailService(SMTPService sMTPService) {
-        this.sMTPService = sMTPService;
+    public EmailService(SMTPService smtpService,
+                        ResumeLogRepository resumeLogRepository,
+                        ResumeTrackingRepository resumeTrackingRepository) {
+        this.smtpService = smtpService;
+        this.resumeLogRepository = resumeLogRepository;
+        this.resumeTrackingRepository = resumeTrackingRepository;
     }
 
     public void sendResume(List<String> recipients) {
+        sendResumeInternal(recipients, false);
+    }
+
+    public void sendResumeForFreeLancing(List<String> recipients) {
+        sendResumeInternal(recipients, true);
+    }
+
+    private void sendResumeInternal(List<String> recipients, boolean isFreelancing) {
         FileSystemResource file = new FileSystemResource(new File(ATTACHMENT_PATH));
         if (!file.exists()) {
             logger.error("Attachment file not found: {}", ATTACHMENT_PATH);
             return;
         }
-        recipients = recipients.stream().map(Trim::trim).filter(Objects::nonNull).distinct().toList();
+
+        recipients = recipients.stream()
+                .map(Trim::trim)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
 
         List<CompletableFuture<Void>> futures = new ArrayList<>();
+
         for (String email : recipients) {
+            if (checkAlreadySent(email, isFreelancing)) {
+                logger.warn("⚠️ Email already sent to: {}", email);
+                continue;
+            }
+
+            ResumeTracking resumeTracking = auditEmailBefore(email);
+
             try {
-                CompletableFuture<Void> voidCompletableFuture = sMTPService.sendEmail(email, file);
-                futures.add(voidCompletableFuture);
+                CompletableFuture<Void> future = isFreelancing
+                        ? smtpService.sendEmailForFreelancing(email, file)
+                        : smtpService.sendEmail(email, file);
+
+                futures.add(future);
+                auditEmailSent(resumeTracking);
             } catch (Exception e) {
-                logger.error("Error while sending email via SMTP, email: {}", email, e);
+                logger.error("❌ Error sending email to: {}", email, e);
+                auditEmailError(resumeTracking);
             }
         }
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
-        int totalSent = sMTPService.getEmailSentCount();
-        logger.info("✅  Total emails successfully sent: {}", totalSent);
+        // Wait for all to complete
+        futures.forEach(CompletableFuture::join);
+
+        int totalSent = smtpService.getEmailSentCount();
+        logger.info("✅ Total emails sent: {}", totalSent);
+
+        resumeLogRepository.save(new ResumeLog(totalSent));
+        smtpService.resetEmailSentCount();
     }
 
-    static class Trim {
+    private boolean checkAlreadySent(String email, boolean isFreelancing) {
+        if (isFreelancing) {
+            return resumeTrackingRepository.existsByRecruiterEmailAndType(email, ResumeTracking.TYPE_FREE_LANCING);
+        } else {
+            return resumeTrackingRepository.existsByRecruiterEmailAndType(email, ResumeTracking.TYPE_FULL_TIME);
+        }
+
+    }
+
+    private ResumeTracking auditEmailBefore(String email) {
+        ResumeTracking tracking = new ResumeTracking();
+        tracking.setRecruiterEmail(email);
+        tracking.setMessage("📧 Sending resume to " + email);
+        return resumeTrackingRepository.save(tracking);
+    }
+
+    private void auditEmailSent(ResumeTracking tracking) {
+        tracking.setStatus(ResumeTracking.STATUS_SENT);
+        tracking.setMessage("✅ Resume sent successfully.");
+        resumeTrackingRepository.save(tracking);
+    }
+
+    private void auditEmailError(ResumeTracking tracking) {
+        tracking.setStatus(ResumeTracking.STATUS_ERROR);
+        tracking.setMessage("❌ Error sending resume.");
+        resumeTrackingRepository.save(tracking);
+    }
+
+   private static class Trim {
         public static String trim(String str) {
-            try {
-                return trimming(str);
-            } catch (Exception e) {
-                logger.error("Error trimming email: {}", str, e);
-                return str;
-            }
-        }
-
-        private static String trimming(@Email String str) {
             return (str == null) ? null : str.trim();
-
         }
     }
-
-
 }

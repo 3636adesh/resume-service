@@ -19,4 +19,10 @@ public class EmailController {
         emailService.sendResume(to);
         return "Resume email sent to " + to;
     }
+
+    @PostMapping("/free-lancing")
+    public String sendForFreeLancing(@RequestBody List<String> to) {
+        emailService.sendResumeForFreeLancing(to);
+        return "Resume email sent to " + to;
+    }
 }

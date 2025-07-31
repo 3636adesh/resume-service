@@ -1,4 +1,4 @@
-package com.example.resume_service;
+package com.example.resume_service.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
