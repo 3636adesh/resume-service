@@ -98,9 +98,9 @@ public class EmailService {
 
     private boolean checkAlreadySent(String email, boolean isFreelancing) {
         if (isFreelancing) {
-            return resumeTrackingRepository.existsByRecruiterEmailAndType(email, ResumeTracking.TYPE_FREE_LANCING);
+            return resumeTrackingRepository.existsByRecruiterEmailAndTypeAndStatusIsNot(email, ResumeTracking.TYPE_FREE_LANCING, ResumeTracking.STATUS_SENT);
         } else {
-            return resumeTrackingRepository.existsByRecruiterEmailAndType(email, ResumeTracking.TYPE_FULL_TIME);
+            return resumeTrackingRepository.existsByRecruiterEmailAndTypeAndStatusIsNot(email, ResumeTracking.TYPE_FULL_TIME, ResumeTracking.STATUS_SENT);
         }
 
     }

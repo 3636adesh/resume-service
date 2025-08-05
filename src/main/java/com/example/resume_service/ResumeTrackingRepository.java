@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ResumeTrackingRepository extends JpaRepository<ResumeTracking, Long> {
 
-    boolean existsByRecruiterEmailAndType(String recruiterEmail,String type);
+    boolean existsByRecruiterEmailAndTypeAndStatusIsNot(String recruiterEmail,String type,String status);
 
 }
