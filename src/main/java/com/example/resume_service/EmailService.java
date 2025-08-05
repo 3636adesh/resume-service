@@ -58,19 +58,32 @@ public class EmailService {
                 continue;
             }
 
-            ResumeTracking resumeTracking = auditEmailBefore(email,isFreelancing);
-
+            ResumeTracking resumeTracking = auditEmailBefore(email, isFreelancing);
+            CompletableFuture<Void> future;
             try {
-                CompletableFuture<Void> future = isFreelancing
+                future = isFreelancing
                         ? smtpService.sendEmailForFreelancing(email, file)
                         : smtpService.sendEmail(email, file);
 
-                futures.add(future);
-                auditEmailSent(resumeTracking);
             } catch (Exception e) {
                 logger.error("❌ Error sending email to: {}", email, e);
                 auditEmailError(resumeTracking);
+                continue;
             }
+
+
+            CompletableFuture<Void> trackedFuture = future.handle((res, ex) -> {
+                if (ex != null) {
+                    logger.error("❌ Async error sending email to: {}", email);
+                    auditEmailError(resumeTracking);
+                } else {
+                    logger.info("✅ Email sent successfully to: {}", email);
+                    auditEmailSent(resumeTracking);
+                }
+                return null;
+            });
+
+            futures.add(trackedFuture);
         }
 
         // Wait for all to complete

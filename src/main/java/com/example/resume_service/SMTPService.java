@@ -21,7 +21,7 @@ public class SMTPService {
     private static final Logger logger = LoggerFactory.getLogger(SMTPService.class);
 
     private final JavaMailSender mailSender;
-    private final ResumeTemplate resumeTemplate;
+    private final ResumeTemplate resumeTemplateForFullTime;
     private final ResumeTemplate resumeTemplateForFreelance;
     private final AtomicInteger emailSentCount = new AtomicInteger(0);
 
@@ -29,13 +29,13 @@ public class SMTPService {
                        @Qualifier("resumeTemplateForFullTime") ResumeTemplate resumeTemplate,
                        @Qualifier("resumeTemplateForFreeLance") ResumeTemplate resumeTemplateForFreelance) {
         this.mailSender = mailSender;
-        this.resumeTemplate = resumeTemplate;
+        this.resumeTemplateForFullTime = resumeTemplate;
         this.resumeTemplateForFreelance = resumeTemplateForFreelance;
     }
 
     @Async("emailExecutor")
     public CompletableFuture<Void> sendEmail(String email, FileSystemResource file) {
-        return send(email, file, resumeTemplate);
+        return send(email, file, resumeTemplateForFullTime);
     }
 
     @Async("emailExecutor")
@@ -66,6 +66,7 @@ public class SMTPService {
             logger.info("Resume sent successfully to {}", email);
         } catch (MessagingException e) {
             logger.error("Failed to send email to {}: {}", email, e.getMessage(), e);
+            return CompletableFuture.failedFuture(e);
         }
 
         return CompletableFuture.completedFuture(null);
