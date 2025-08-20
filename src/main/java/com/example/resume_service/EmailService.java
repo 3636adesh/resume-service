@@ -98,14 +98,14 @@ public class EmailService {
 
     private boolean checkAlreadySent(String email, boolean isFreelancing) {
         if (isFreelancing) {
-            return resumeTrackingRepository.existsByRecruiterEmailAndTypeAndStatusIsNot(email, ResumeTracking.TYPE_FREE_LANCING, ResumeTracking.STATUS_SENT);
+            return resumeTrackingRepository.existsByRecruiterEmailAndTypeAndStatus(email, ResumeTracking.TYPE_FREE_LANCING, ResumeTracking.STATUS_SENT);
         } else {
-            return resumeTrackingRepository.existsByRecruiterEmailAndTypeAndStatusIsNot(email, ResumeTracking.TYPE_FULL_TIME, ResumeTracking.STATUS_SENT);
+            return resumeTrackingRepository.existsByRecruiterEmailAndTypeAndStatus(email, ResumeTracking.TYPE_FULL_TIME, ResumeTracking.STATUS_SENT);
         }
 
     }
 
-    private ResumeTracking auditEmailBefore(String email, boolean isFreelancing) {
+    private ResumeTracking  auditEmailBefore(String email, boolean isFreelancing) {
         ResumeTracking tracking = new ResumeTracking();
         tracking.setRecruiterEmail(email);
         tracking.setMessage("📧 Sending resume to " + email);
