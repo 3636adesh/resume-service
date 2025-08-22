@@ -51,10 +51,11 @@ public class EmailService {
                 .toList();
 
         List<CompletableFuture<Void>> futures = new ArrayList<>();
-
+          int unsentCount = 0;
         for (String email : recipients) {
             if (checkAlreadySent(email, isFreelancing)) {
                 logger.warn("⚠️ Email already sent to: {}", email);
+                unsentCount++;
                 continue;
             }
 
@@ -91,6 +92,9 @@ public class EmailService {
 
         int totalSent = smtpService.getEmailSentCount();
         logger.info("✅ Total emails sent: {}", totalSent);
+        if (unsentCount > 0) {
+            logger.info("ℹ️ Total emails skipped (already sent): {}", unsentCount);
+        }
 
         resumeLogRepository.save(new ResumeLog(totalSent));
         smtpService.resetEmailSentCount();
