@@ -1,7 +1,9 @@
 package com.example.resume_service;
 
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,14 @@ public class EmailService {
     private final SMTPService smtpService;
     private final ResumeLogRepository resumeLogRepository;
     private final ResumeTrackingRepository resumeTrackingRepository;
+
+    @Value("${audit.ignore-emails}")
+    private List<String> ignoreEmails;
+
+    @PostConstruct
+    public void init() {
+        logger.info("Ignoring emails for audit: {}", ignoreEmails);
+    }
 
     public EmailService(SMTPService smtpService,
                         ResumeLogRepository resumeLogRepository,
@@ -51,9 +61,10 @@ public class EmailService {
                 .toList();
 
         List<CompletableFuture<Void>> futures = new ArrayList<>();
-          int unsentCount = 0;
+        int unsentCount = 0;
         for (String email : recipients) {
-            if (checkAlreadySent(email, isFreelancing)) {
+
+            if (!ignoreEmails.contains(email) && checkAlreadySent(email, isFreelancing)) {
                 logger.warn("⚠️ Email already sent to: {}", email);
                 unsentCount++;
                 continue;
@@ -109,7 +120,7 @@ public class EmailService {
 
     }
 
-    private ResumeTracking  auditEmailBefore(String email, boolean isFreelancing) {
+    private ResumeTracking auditEmailBefore(String email, boolean isFreelancing) {
         ResumeTracking tracking = new ResumeTracking();
         tracking.setRecruiterEmail(email);
         tracking.setMessage("📧 Sending resume to " + email);
