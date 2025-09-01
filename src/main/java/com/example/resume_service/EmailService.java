@@ -86,7 +86,7 @@ public class EmailService {
 
             CompletableFuture<Void> trackedFuture = future.handle((res, ex) -> {
                 if (ex != null) {
-                    logger.error("❌ Async error sending email to: {}", email);
+                    logger.error("❌ Async error sending email to: {}", email,ex);
                     auditEmailError(resumeTracking);
                 } else {
                     logger.info("✅ Email sent successfully to: {}", email);
