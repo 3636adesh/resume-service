@@ -55,41 +55,36 @@ public class EmailService {
         }
 
         recipients = recipients.stream()
-                .map(Trim::trim)
                 .filter(Objects::nonNull)
+                .map(String::trim)
                 .distinct()
                 .toList();
 
         List<CompletableFuture<Void>> futures = new ArrayList<>();
         int unsentCount = 0;
         for (String email : recipients) {
-
             if (!ignoreEmails.contains(email) && checkAlreadySent(email, isFreelancing)) {
                 logger.warn("⚠️ Email already sent to: {}", email);
                 unsentCount++;
                 continue;
             }
-
             ResumeTracking resumeTracking = auditEmailBefore(email, isFreelancing);
             CompletableFuture<Void> future;
             try {
                 future = isFreelancing
                         ? smtpService.sendEmailForFreelancing(email, file)
                         : smtpService.sendEmail(email, file);
-
             } catch (Exception e) {
                 logger.error("❌ Error sending email to: {}", email, e);
                 auditEmailError(resumeTracking);
                 continue;
             }
-
-
             CompletableFuture<Void> trackedFuture = future.handle((res, ex) -> {
                 if (ex != null) {
-                    logger.error("❌ Async error sending email to: {}", email,ex);
+                    logger.error("❌ Async error sending email to: {}", email, ex);
                     auditEmailError(resumeTracking);
                 } else {
-                    logger.info("✅ Email sent successfully to: {}", email);
+//                    logger.info("✅ Email sent successfully to: {}", email);
                     auditEmailSent(resumeTracking);
                 }
                 return null;
@@ -117,7 +112,6 @@ public class EmailService {
         } else {
             return resumeTrackingRepository.existsByRecruiterEmailAndTypeAndStatus(email, ResumeTracking.TYPE_FULL_TIME, ResumeTracking.STATUS_SENT);
         }
-
     }
 
     private ResumeTracking auditEmailBefore(String email, boolean isFreelancing) {
@@ -142,9 +136,4 @@ public class EmailService {
         resumeTrackingRepository.save(tracking);
     }
 
-    private static class Trim {
-        public static String trim(String str) {
-            return (str == null) ? null : str.trim();
-        }
-    }
 }
